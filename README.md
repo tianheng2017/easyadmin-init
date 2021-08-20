@@ -1,3 +1,3 @@
 # easyadmin幸福版
 
-## 支持thinkphp6.0.9 + php8
+## 框架升级到thinkphp6.0.9, 支持php8
