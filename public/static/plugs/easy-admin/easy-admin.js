@@ -616,6 +616,13 @@ define(["jquery", "tableSelect", "ckeditor"], function ($, tableSelect, undefine
                             operat.text = operat.text || operat.title;
                             operat.extend = operat.extend || '';
                             operat.url = admin.table.toolSpliceUrl(operat.url, operat.field, data);
+							
+							// 自定义弹窗标题风格
+                            operat.extra = operat.extra || '';
+                            if (data[operat.extra] !== undefined) {
+                                operat.title = data[operat.extra] + ' - ' + operat.title;
+                            }
+							
                             if (admin.checkAuth(operat.auth, elem)) {
                                 if (typeof operat.render === 'function') {
                                     html += operat.render(data, option) ? admin.table.buildOperatHtml(operat) : '';

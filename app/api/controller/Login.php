@@ -3,10 +3,10 @@
 namespace app\api\controller;
 
 use app\admin\model\User;
-use app\ApiBaseController;
+use app\BaseController;
 use think\Exception;
 
-class Login extends ApiBaseController
+class Login extends BaseController
 {
     public function index()
     {
