@@ -214,12 +214,17 @@ class AdminController extends BaseController
         $this->success(null, $data);
     }
 	
-	/**
+    /**
      * 小按钮首页
      */
     public function min_menu_index($class, $field, $with){
         $id = $this->request->param('id/d',0);
         empty($id) && $this->error('提交参数出错');
+
+        if (input('selectFields')) {
+            return $this->selectList();
+        }
+        list($page, $limit, $where) = $this->buildTableParames();
 
         // 关联字段
         $map[] = [$field, '=', $id];
@@ -228,8 +233,16 @@ class AdminController extends BaseController
             if (input('selectFieds')) {
                 return $this->selectList();
             }
-            $count = $class::with($with)->where($map)->count();
-            $list = $class::with($with)->where($map)->select();
+            $count = $class::with($with)
+                    ->where($where)
+                    ->where($map)
+                    ->count();
+            $list = $class::with($with)
+                    ->where($where)
+                    ->where($map)
+                    ->page($page, $limit)
+                    ->order($this->sort)
+                    ->select();
             $data = [
                 'code'  => 0,
                 'msg'   => '',
