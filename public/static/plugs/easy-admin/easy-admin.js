@@ -458,6 +458,8 @@ define(["jquery", "tableSelect", "ckeditor"], function ($, tableSelect, undefine
                 formatToolbar.class = formatToolbar.class !== '' ? 'class="' + formatToolbar.class + '" ' : '';
                 if (toolbar.method === 'open') {
                     formatToolbar.method = formatToolbar.method !== '' ? 'data-open="' + formatToolbar.url + '" data-title="' + formatToolbar.title + '" ' : '';
+				} else if (toolbar.method === 'none'){ // 常用于与extend配合，自定义监听按钮
+                    formatOperat.method = '';
                 } else {
                     formatToolbar.method = formatToolbar.method !== '' ? 'data-request="' + formatToolbar.url + '" data-title="' + formatToolbar.title + '" ' : '';
                 }
@@ -483,7 +485,9 @@ define(["jquery", "tableSelect", "ckeditor"], function ($, tableSelect, undefine
                 formatOperat.icon = formatOperat.icon !== '' ? '<i class="' + formatOperat.icon + '"></i> ' : '';
                 formatOperat.class = formatOperat.class !== '' ? 'class="' + formatOperat.class + '" ' : '';
                 if (operat.method === 'open') {
-                    formatOperat.method = formatOperat.method !== '' ? 'data-open="' + formatOperat.url + '" data-title="' + formatOperat.title + '" ' : '';
+					formatOperat.method = formatOperat.method !== '' ? 'data-open="' + formatOperat.url + '" data-title="' + formatOperat.title + '" ' : '';
+				} else if (operat.method === 'none'){ // 常用于与extend配合，自定义监听按钮
+                    formatOperat.method = '';
                 } else {
                     formatOperat.method = formatOperat.method !== '' ? 'data-request="' + formatOperat.url + '" data-title="' + formatOperat.title + '" ' : '';
                 }
@@ -617,7 +621,7 @@ define(["jquery", "tableSelect", "ckeditor"], function ($, tableSelect, undefine
                             operat.extend = operat.extend || '';
                             operat.url = admin.table.toolSpliceUrl(operat.url, operat.field, data);
 							
-							// 自定义弹窗标题风格
+							// 自定义弹窗标题风格，extra是表格里的，欲加入标题中的字段
                             operat.extra = operat.extra || '';
                             if (data[operat.extra] !== undefined) {
                                 operat.title = data[operat.extra] + ' - ' + operat.title;
