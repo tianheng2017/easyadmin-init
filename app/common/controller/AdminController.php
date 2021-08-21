@@ -74,6 +74,16 @@ class AdminController extends BaseController
      * @var string|bool
      */
     protected $layout = 'layout/default';
+	
+	/**
+     * 当前用户
+     */
+    protected $user;
+
+    /**
+     * 是否是超级管理员
+     */
+    protected $isSuper = 0;
 
     /**
      * 初始化方法
@@ -82,6 +92,17 @@ class AdminController extends BaseController
     {
         parent::initialize();
         $this->layout && $this->app->view->engine()->layout($this->layout);
+		
+        $this->user = SystemAdmin::find(session('admin.id'));
+
+        if (!empty($this->user)) {
+            if ($this->user->id == AdminConstant::SUPER_ADMIN_ID) {
+                $this->isSuper = 1;
+            }
+        }
+
+        $this->assign('isSuper', $this->isSuper);
+        $this->assign('user', $this->user);
     }
 
     /**
@@ -191,6 +212,95 @@ class AdminController extends BaseController
             ->field($fields)
             ->select();
         $this->success(null, $data);
+    }
+	
+	/**
+     * 小按钮首页
+     */
+    public function min_menu_index($class, $field, $with){
+        $id = $this->request->param('id/d',0);
+        empty($id) && $this->error('提交参数出错');
+
+        // 关联字段
+        $map[] = [$field, '=', $id];
+
+        if ($this->request->isAjax()) {
+            if (input('selectFieds')) {
+                return $this->selectList();
+            }
+            $count = $class::with($with)->where($map)->count();
+            $list = $class::with($with)->where($map)->select();
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => $count,
+                'data'  => $list,
+            ];
+            return json($data);
+        }
+        $this->assign('source_id', $id);
+        return $this->fetch();
+    }
+	
+	/**
+     * 小按钮新增
+     */
+    public function min_menu_add($class, $field, $rule = [])
+    {
+        $source_id = $this->request->param('source_id/d');
+        empty($source_id) && $this->error('提交参数出错');
+        if ($this->request->isAjax()) {
+            $post = $this->request->post();
+            $this->validate($post, $rule);
+
+            // 关联字段
+            $post[$field] = $source_id;
+
+            try {
+                $save = (new $class)->save($post);
+            } catch (\Exception $e) {
+                $this->error('保存失败');
+            }
+            $save ? $this->success('保存成功') : $this->error('保存失败');
+        }
+        $this->assign('source_id', $source_id);
+        return $this->fetch();
+    }
+
+    /**
+     * 小按钮编辑
+     */
+    public function min_menu_edit($class, $rule = [])
+    {
+        $row = $class::find($this->request->param('id/d'));
+        empty($row) && $this->error('数据不存在');
+        if ($this->request->isAjax()) {
+            $post = $this->request->post();
+            $this->validate($post, $rule);
+            try {
+                $save = $row->save($post);
+            } catch (\Exception $e) {
+                $this->error('保存失败');
+            }
+            $save ? $this->success('保存成功') : $this->error('保存失败');
+        }
+        $this->assign('row', $row);
+        return $this->fetch();
+    }
+
+    /**
+     * 小按钮删除
+     */
+    public function min_menu_delete($class)
+    {
+        $row = $class::whereIn('id', $this->request->param('id'))->select();
+        $row->isEmpty() && $this->error('数据不存在');
+        try {
+            $save = $row->delete();
+        } catch (\Exception $e) {
+            $this->error('删除失败');
+        }
+        $save ? $this->success('删除成功') : $this->error('删除失败');
     }
 
 }
