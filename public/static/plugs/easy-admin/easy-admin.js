@@ -750,6 +750,9 @@ define(["jquery", "tableSelect", "ckeditor"], function ($, tableSelect, undefine
                 try {
                     value = eval("data." + field);
                 } catch (e) {}
+				if (value == null) {
+                    return '<span>无</span>';
+                }
                 if (!admin.empty(value)){
                     value = util.toDateString(value * 1000, option.format || 'yyyy-MM-dd HH:mm:ss');
                 }
